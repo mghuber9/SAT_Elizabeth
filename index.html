@@ -61,8 +61,7 @@
 
   <!-- Zoom banner (below the header) -->
   <section style="background:#EEF1FF; padding:12px 16px; border-bottom:1px solid #D7DBF0; text-align:center;">
-    <a href="https://us06web.zoom.us/j/7612376123"
-       target="_blank"
+    <a href="https://us06web.zoom.us/j/7612376123" target="_blank"
        style="font-weight:700; color:#6A8CFF; text-decoration:none; font-size:16px;">
       Join Zoom Meeting
     </a>
@@ -115,107 +114,112 @@
   </script>
 
   <script>
-  // ===== Fixed links (each SAT has its own URLs) =====
-  const DEFAULT_LINKS = {
-    "SAT 1": {
-      "Math Module 1": "https://www.zipgrade.com/s/h4nlr0u/",
-      "Math Module 2": "https://www.zipgrade.com/s/tk1i4pm/",
-      "R&W Module 1": "https://www.zipgrade.com/s/0IipBD8/",
-      "R&W Module 2": "https://www.zipgrade.com/s/RtgiO6W/"
-    },
-    "SAT 2": { "Math Module 1": "#", "Math Module 2": "#", "R&W Module 1": "#", "R&W Module 2": "#" },
-    "SAT 3": { "Math Module 1": "#", "Math Module 2": "#", "R&W Module 1": "#", "R&W Module 2": "#" },
-    "SAT 4": { "Math Module 1": "#", "Math Module 2": "#", "R&W Module 1": "#", "R&W Module 2": "#" },
-    "SAT 5": { "Math Module 1": "#", "Math Module 2": "#", "R&W Module 1": "#", "R&W Module 2": "#" },
-    "SAT 6": { "Math Module 1": "#", "Math Module 2": "#", "R&W Module 1": "#", "R&W Module 2": "#" }
-  };
+  document.addEventListener("DOMContentLoaded", function(){
+    // ===== Fixed links (each SAT has its own URLs) =====
+    var DEFAULT_LINKS = {
+      "SAT 1": {
+        "Math Module 1": "https://www.zipgrade.com/s/h4nlr0u/",
+        "Math Module 2": "https://www.zipgrade.com/s/tk1i4pm/",
+        "R&W Module 1": "https://www.zipgrade.com/s/0IipBD8/",
+        "R&W Module 2": "https://www.zipgrade.com/s/RtgiO6W/"
+      },
+      "SAT 2": { "Math Module 1": "#", "Math Module 2": "#", "R&W Module 1": "#", "R&W Module 2": "#" },
+      "SAT 3": { "Math Module 1": "#", "Math Module 2": "#", "R&W Module 1": "#", "R&W Module 2": "#" },
+      "SAT 4": { "Math Module 1": "#", "Math Module 2": "#", "R&W Module 1": "#", "R&W Module 2": "#" },
+      "SAT 5": { "Math Module 1": "#", "Math Module 2": "#", "R&W Module 1": "#", "R&W Module 2": "#" },
+      "SAT 6": { "Math Module 1": "#", "Math Module 2": "#", "R&W Module 1": "#", "R&W Module 2": "#" }
+    };
 
-  // Parse shared scores JSON
-  function getSharedScores(){
-    try{
-      const json = document.getElementById("SHARED_SCORES").textContent;
-      return JSON.parse(json);
-    }catch(e){
-      console.warn("Could not parse SHARED_SCORES JSON:", e);
-      return {};
+    function getSharedScores(){
+      try{
+        var json = document.getElementById("SHARED_SCORES").textContent;
+        return JSON.parse(json);
+      }catch(e){
+        console.warn("Could not parse SHARED_SCORES JSON:", e);
+        return {};
+      }
     }
-  }
 
-  const wrap = document.getElementById("wrap");
-  const links = DEFAULT_LINKS;
-  const sharedScores = getSharedScores();
-  render();
+    var wrap = document.getElementById("wrap");
+    var links = DEFAULT_LINKS;
+    var sharedScores = getSharedScores();
 
-  function render(){
-    wrap.innerHTML = "";
-    const tests = Object.keys(links).sort((a,b)=> +a.split(" ")[1] - +b.split(" ")[1]);
-    tests.forEach(testName => {
-      wrap.appendChild(section(testName));
-    });
-  }
+    render();
 
-  function section(testName){
-    const sec = el("section", {class:"sat-section"});
-    const header = el("div", {class:"sat-header"});
-    header.append(el("div", {class:"sat-title"}, testName),
-                  el("div", {class:"sat-sub"}, "Modules & composites"));
-    sec.append(header);
+    function render(){
+      wrap.innerHTML = "";
+      var tests = Object.keys(links).sort(function(a,b){
+        return (+a.split(" ")[1]) - (+b.split(" ")[1]);
+      });
+      tests.forEach(function(testName){
+        wrap.appendChild(section(testName));
+      });
+    }
 
-    const grid = el("div", {class:"sat-grid"});
-    ["Math Module 1","Math Module 2","R&W Module 1","R&W Module 2"].forEach(mod => {
-      grid.append(card(testName, mod, links[testName][mod]));
-    });
-    sec.append(grid);
+    function section(testName){
+      var sec = el("section", {class:"sat-section"});
+      var header = el("div", {class:"sat-header"});
+      header.append(el("div", {class:"sat-title"}, testName),
+                    el("div", {class:"sat-sub"}, "Modules & composites"));
+      sec.append(header);
 
-    // Totals row
-    const totals = el("div", {class:"totals"});
-    totals.append(totalChip("Composite Math", scoreOf(testName, "Composite Math")));
-    totals.append(totalChip("Composite Verbal", scoreOf(testName, "Composite Verbal")));
-    totals.append(totalChip("Overall", scoreOf(testName, "Overall")));
-    sec.append(totals);
+      var grid = el("div", {class:"sat-grid"});
+      ["Math Module 1","Math Module 2","R&W Module 1","R&W Module 2"].forEach(function(mod){
+        grid.append(card(testName, mod, links[testName][mod]));
+      });
+      sec.append(grid);
 
-    return sec;
-  }
+      var totals = el("div", {class:"totals"});
+      totals.append(totalChip("Composite Math", scoreOf(testName, "Composite Math")));
+      totals.append(totalChip("Composite Verbal", scoreOf(testName, "Composite Verbal")));
+      totals.append(totalChip("Overall", scoreOf(testName, "Overall")));
+      sec.append(totals);
 
-  function totalChip(label, value){
-    const chip = el("div", {class:"chip"});
-    const l = el("label", {}, label + ":");
-    const v = el("span", {class:"score", title:"Edit in SCORES JSON"}, value || "—");
-    chip.append(l, v);
-    return chip;
-  }
+      return sec;
+    }
 
-  function scoreOf(testName, key){
-    return (sharedScores?.[testName]?.[key]) || "—";
-  }
+    function totalChip(label, value){
+      var chip = el("div", {class:"chip"});
+      var l = el("label", {}, label + ":");
+      var v = el("span", {class:"score", title:"Edit in SCORES JSON"}, value || "—");
+      chip.append(l, v);
+      return chip;
+    }
 
-  function card(testName, moduleName, url){
-    const card = el("div", {class:"card"});
-    const header = el("div", {class:"row"});
-    header.append(el("h3", {}, moduleName));
-    card.append(header);
+    function scoreOf(testName, key){
+      var ts = sharedScores && sharedScores[testName];
+      return (ts && ts[key]) ? ts[key] : "—";
+    }
 
-    const row1 = el("div", {class:"row"});
-    const link = el("a", {class:"linklike", href:url || "#", target:"_blank", rel:"noopener noreferrer"}, "Open Test");
-    row1.append(link);
-    card.append(row1);
+    function card(testName, moduleName, url){
+      var card = el("div", {class:"card"});
+      var header = el("div", {class:"row"});
+      header.append(el("h3", {}, moduleName));
+      card.append(header);
 
-    // Score row (read-only display)
-    const row2 = el("div", {class:"row"});
-    const val = (sharedScores?.[testName]?.[moduleName]) || "—";
-    const score = el("span", {class:"score", title:"Edit in SCORES JSON"}, val);
-    row2.append(score, el("span", {class:"muted"}, "Shared (from HTML)"));
-    card.append(row2);
+      var row1 = el("div", {class:"row"});
+      var link = el("a", {class:"linklike", href:url || "#", target:"_blank", rel:"noopener noreferrer"}, "Open Test");
+      row1.append(link);
+      card.append(row1);
 
-    return card;
-  }
+      var row2 = el("div", {class:"row"});
+      var ts = sharedScores && sharedScores[testName];
+      var val = (ts && ts[moduleName]) ? ts[moduleName] : "—";
+      var score = el("span", {class:"score", title:"Edit in SCORES JSON"}, val);
+      row2.append(score, el("span", {class:"muted"}, "Shared (from HTML)"));
+      card.append(row2);
 
-  function el(tag, attrs={}, text){
-    const n = document.createElement(tag);
-    Object.entries(attrs).forEach(([k,v]) => n.setAttribute(k, v));
-    if(text!=null) n.append(document.createTextNode(text));
-    return n;
-  }
+      return card;
+    }
+
+    function el(tag, attrs, text){
+      if(!attrs) attrs = {};
+      var n = document.createElement(tag);
+      Object.keys(attrs).forEach(function(k){ n.setAttribute(k, attrs[k]); });
+      if(text != null) n.append(document.createTextNode(text));
+      return n;
+    }
+  });
   </script>
 </body>
 </html>
