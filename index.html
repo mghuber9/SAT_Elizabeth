@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elizabeth's Digital SAT Practice Tests – Links & Scores</title>
+  <style>
+    
+    :root{
+      /* Bright Light Theme using Palette #3 accents (Periwinkle & Peach) */
+      --bg: #F7F8FF;        /* very light periwinkle */
+      --card: #FFFFFF;      /* white cards */
+      --text: #1F2330;      /* dark ink */
+      --muted: #6B7390;     /* muted slate */
+      --brand: #6A8CFF;     /* bold periwinkle */
+      --accent: #FF9F80;    /* peach pop */
+      --border: #D7DBF0;    /* soft periwinkle border */
+      --brand-ink: #ffffff; /* button text on brand */
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; background:var(--bg); color:var(--text);}
+    header{padding:28px 16px; border-bottom:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(106,140,255,0.18), rgba(255,159,128,0.12) 60%, transparent);}
+    h1{margin:0 0 6px; font-size: clamp(22px, 3.2vw, 34px)}
+    p{margin:0; color:var(--muted)}
+    .container{max-width:1100px; margin:0 auto; padding:20px 16px 56px;}
+    .toolbar{display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 24px}
+    button,.linklike{
+      appearance:none; border:2px solid var(--brand); background:var(--brand); color:var(--brand-ink);
+      padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:800; text-decoration:none;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.12);
+    }
+    button:hover,.linklike:hover{filter:brightness(1.05)}
+    .linklike.secondary{background:transparent; color:var(--text); border-color:var(--border)}
+    .sat-section{padding:22px 0 26px; border-top:2px solid var(--border)}
+    .sat-header{display:flex; align-items:baseline; gap:10px; margin:6px 0 14px}
+    .sat-title{font-size:18px; font-weight:900; color:#131729}
+    .sat-sub{font-size:12px; color:var(--muted)}
+    .sat-grid{display:grid; grid-template-columns: repeat(1, minmax(0,1fr)); gap:12px}
+    @media(min-width:800px){ .sat-grid{ grid-template-columns: repeat(4, minmax(0,1fr)); } }
+    .card{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px;
+      box-shadow: 0 6px 16px rgba(18,24,46,0.06)}
+    .card h3{margin:0; font-size:16px; color:#1c2140}
+    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .muted{color:var(--muted); font-size:12px}
+    .score{min-width:110px; font-weight:900; letter-spacing:0.2px}
+    .badge{font-size:11px; padding:2px 8px; border-radius:999px; border:1px solid var(--border); background:#EEF1FF; color:#2a3375}
+    .footer{margin-top:36px; color:var(--muted); font-size:13px}
+    .totals{margin-top:12px; background:linear-gradient(90deg, rgba(106,140,255,0.14), rgba(255,159,128,0.10)); border:1px solid var(--border); border-radius:14px; padding:12px; display:flex; flex-wrap:wrap; gap:12px}
+    .totals .chip{padding:8px 12px; border-radius:999px; border:1px dashed var(--brand); background:#EEF1FF; font-weight:800; color:#1F2330}
+    .totals label{font-size:12px; color:var(--muted); margin-right:6px; font-weight:700}
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Elizabeth's Digital SAT Practice Tests</h1>
+      <p>Quick links for SAT 1–6. Links and scores are set in this HTML only; students cannot edit on the page.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="toolbar">
+      <span class="spacer"></span>
+      <button onclick="window.print()">Print</button>
+    </div>
+
+    <div id="wrap"></div>
+
+    <section class="footer">
+      <p><span class="badge">Tip</span> Host on GitHub Pages and embed in Google Sites (iframe). Edit the URLs in <strong>DEFAULT_LINKS</strong> and the scores in the <strong>SCORES</strong> JSON below.</p>
+    </section>
+  </main>
+
+  <!-- ===== Shared Scores Configuration (edit these placeholders) ===== -->
+  <script id="SHARED_SCORES" type="application/json">
+  {
+    "SAT 1": {
+      "Math Module 1": "—", "Math Module 2": "—", "R&W Module 1": "—", "R&W Module 2": "—",
+      "Composite Math": "—", "Composite Verbal": "—", "Overall": "—"
+    },
+    "SAT 2": {
+      "Math Module 1": "—", "Math Module 2": "—", "R&W Module 1": "—", "R&W Module 2": "—",
+      "Composite Math": "—", "Composite Verbal": "—", "Overall": "—"
+    },
+    "SAT 3": {
+      "Math Module 1": "—", "Math Module 2": "—", "R&W Module 1": "—", "R&W Module 2": "—",
+      "Composite Math": "—", "Composite Verbal": "—", "Overall": "—"
+    },
+    "SAT 4": {
+      "Math Module 1": "—", "Math Module 2": "—", "R&W Module 1": "—", "R&W Module 2": "—",
+      "Composite Math": "—", "Composite Verbal": "—", "Overall": "—"
+    },
+    "SAT 5": {
+      "Math Module 1": "—", "Math Module 2": "—", "R&W Module 1": "—", "R&W Module 2": "—",
+      "Composite Math": "—", "Composite Verbal": "—", "Overall": "—"
+    },
+    "SAT 6": {
+      "Math Module 1": "—", "Math Module 2": "—", "R&W Module 1": "—", "R&W Module 2": "—",
+      "Composite Math": "—", "Composite Verbal": "—", "Overall": "—"
+    }
+  }
+  </script>
+
+  <script>
+    // ===== Fixed links (edit for everyone) =====
+    const DEFAULT_LINKS = (() => {
+      const mk = () => ({
+        "Math Module 1": "#",
+        "Math Module 2": "#",
+        "R&W Module 1": "#",
+        "R&W Module 2": "#"
+      });
+      const obj = {};
+      for (let i=1;i<=6;i++){ obj[`SAT ${i}`] = mk(); }
+      return obj;
+    })();
+
+    // Parse shared scores JSON
+    function getSharedScores(){
+      try{
+        const json = document.getElementById("SHARED_SCORES").textContent;
+        return JSON.parse(json);
+      }catch(e){
+        console.warn("Could not parse SHARED_SCORES JSON:", e);
+        return {};
+      }
+    }
+
+    const wrap = document.getElementById("wrap");
+    const links = DEFAULT_LINKS;
+    const sharedScores = getSharedScores();
+    render();
+
+    function render(){
+      wrap.innerHTML = "";
+      const tests = Object.keys(links).sort((a,b)=> +a.split(" ")[1] - +b.split(" ")[1]);
+      tests.forEach(testName => {
+        wrap.appendChild(section(testName));
+      });
+    }
+
+    function section(testName){
+      const sec = el("section", {class:"sat-section"});
+      const header = el("div", {class:"sat-header"});
+      header.append(el("div", {class:"sat-title"}, testName),
+                    el("div", {class:"sat-sub"}, "Modules & composites"));
+      sec.append(header);
+
+      const grid = el("div", {class:"sat-grid"});
+      ["Math Module 1","Math Module 2","R&W Module 1","R&W Module 2"].forEach(mod => {
+        grid.append(card(testName, mod, links[testName][mod]));
+      });
+      sec.append(grid);
+
+      // Totals row
+      const totals = el("div", {class:"totals"});
+      totals.append(totalChip("Composite Math", scoreOf(testName, "Composite Math")));
+      totals.append(totalChip("Composite Verbal", scoreOf(testName, "Composite Verbal")));
+      totals.append(totalChip("Overall", scoreOf(testName, "Overall")));
+      sec.append(totals);
+
+      return sec;
+    }
+
+    function totalChip(label, value){
+      const chip = el("div", {class:"chip"});
+      const l = el("label", {}, label + ":");
+      const v = el("span", {class:"score", title:"Edit in SCORES JSON"}, value || "—");
+      chip.append(l, v);
+      return chip;
+    }
+
+    function scoreOf(testName, key){
+      return (sharedScores?.[testName]?.[key]) || "—";
+    }
+
+    function card(testName, moduleName, url){
+      const card = el("div", {class:"card"});
+      const header = el("div", {class:"row"});
+      header.append(el("h3", {}, moduleName));
+      card.append(header);
+
+      const row1 = el("div", {class:"row"});
+      const link = el("a", {class:"linklike", href:url || "#", target:"_blank", rel:"noopener noreferrer"}, "Open Test");
+      row1.append(link);
+      card.append(row1);
+
+      // Score row (read-only display)
+      const row2 = el("div", {class:"row"});
+      const val = (sharedScores?.[testName]?.[moduleName]) || "—";
+      const score = el("span", {class:"score", title:"Edit in SCORES JSON"}, val);
+      row2.append(score, el("span", {class:"muted"}, "Shared (from HTML)"));
+      card.append(row2);
+
+      return card;
+    }
+
+    function el(tag, attrs={}, text){
+      const n = document.createElement(tag);
+      Object.entries(attrs).forEach(([k,v]) => n.setAttribute(k, v));
+      if(text!=null) n.append(document.createTextNode(text));
+      return n;
+    }
+  </script>
+</body>
+</html>
