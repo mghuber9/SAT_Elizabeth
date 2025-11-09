@@ -115,6 +115,53 @@
       color:var(--brand);
     }
 
+    /* Progress bars */
+    .progress-section{
+      background:#FFFFFF;
+      border-bottom:1px solid var(--border);
+      padding:12px 16px 16px;
+    }
+    .progress-title{
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      color:var(--muted);
+      text-align:center;
+      margin-bottom:6px;
+    }
+    .progress-row{
+      max-width:720px;
+      margin:6px auto;
+      display:grid;
+      grid-template-columns:minmax(0,110px) 1fr minmax(0,160px);
+      gap:10px;
+      align-items:center;
+      font-size:13px;
+    }
+    .progress-label{
+      font-weight:700;
+      color:#1F2330;
+    }
+    .progress-meta{
+      text-align:right;
+      color:var(--muted);
+    }
+    .progress-track{
+      position:relative;
+      height:10px;
+      border-radius:999px;
+      background:#D7DBF0;
+      overflow:hidden;
+    }
+    .progress-fill{
+      position:absolute;
+      inset:0;
+      width:0;
+      background:linear-gradient(90deg,var(--brand),var(--accent));
+      transition:width .4s ease-out;
+    }
+
     /* Focus tips strip */
     .focus-strip{
       background:#FFFFFF;
@@ -159,16 +206,26 @@
   <section class="goal-scores">
     <div class="goal-column">
       <span>Verbal Goal</span>
-      <span class="goal-value">—</span>
+      <span class="goal-value">—</span>  <!-- Replace — with goal verbal score -->
     </div>
     <div class="goal-column">
       <span>Math Goal</span>
-      <span class="goal-value">—</span>
+      <span class="goal-value">—</span>  <!-- Replace — with goal math score -->
     </div>
     <div class="goal-column">
       <span>Composite Goal</span>
-      <span class="goal-value">—</span>
+      <span class="goal-value">—</span>  <!-- Replace — with goal composite score -->
     </div>
+  </section>
+
+  <!-- Progress bars (auto-calculated) -->
+  <section class="progress-section">
+    <div class="progress-title">Progress Toward Goal</div>
+
+    <!-- Edit data-goal and data-current values only -->
+    <div class="progress-row" data-label="Verbal" data-goal="700" data-current="0"></div>
+    <div class="progress-row" data-label="Math" data-goal="700" data-current="0"></div>
+    <div class="progress-row" data-label="Composite" data-goal="1400" data-current="0"></div>
   </section>
 
   <!-- Random focus tips -->
@@ -243,33 +300,24 @@
   <script>
   document.addEventListener("DOMContentLoaded", function(){
 
-    /* -------- Focus tips bank (from Study & Mindset tips) -------- */
+    /* -------- Focus tips bank -------- */
     var FOCUS_TIPS = [
       'Review why you missed, not just what you missed.',
       'Study 20 focused minutes daily > 3 hours once a week.',
       'Track your errors by type (concept, careless, time).',
-      'Build your own "SAT dictionary" of missed vocab.',
-      'Re-solve missed questions a week later—test your retention.',
+      'Build your own SAT “mistake journal.”',
+      'Re-solve missed questions a week later to test retention.',
       'Simulate test timing at least twice before test day.',
-      'Study early in the day when focus is sharpest.',
-      'Use the same calculator you\'ll bring to the test.',
-      'Set micro-goals: "I\'ll master quadratic forms today."',
-      'Record yourself explaining a problem—it cements learning.',
-      'Don\'t skip rest—tired brains forget faster.',
+      'Use the same calculator you’ll bring to the test.',
+      'Set micro-goals: “I’ll master one skill this session.”',
+      'Talk through a problem out loud as if teaching it.',
       'Revisit easy wins to build confidence before tough sets.',
-      'Study in the same posture/environment you\'ll test in.',
-      'Stack skills: combine algebra + geometry in one drill.',
-      'Keep a "mistake log" you actually reread.',
-      'Don\'t measure progress daily—track it weekly.',
-      'Use official tests first—quality over quantity.',
-      'Make flashcards for patterns, not just vocab.',
-      'Test anxiety? Practice breathing resets between sections.',
-      'Reward consistency, not perfection.',
+      'Study in the same posture/environment you’ll test in.',
+      'Keep a simple checklist for test day (ID, calculator, snacks).',
+      'Don’t aim for perfect—aim for a little better than last week.',
       'Review your wrong answers before closing your notebook.',
-      'Group-study can work—if you each teach one concept.',
-      'Predict the answer before you peek at choices.',
-      'The goal isn\'t perfection; it\'s predictable improvement.',
-      'Small daily progress beats last-minute panic every time.'
+      'Predict answers before looking at choices.',
+      'Reward consistency, not perfection.'
     ];
 
     var focusWrap = document.getElementById("focus-pills");
@@ -285,6 +333,43 @@
         focusWrap.appendChild(pill);
       }
     }
+
+    /* -------- Progress bars -------- */
+    function buildProgress(){
+      var rows = document.querySelectorAll(".progress-row");
+      rows.forEach = rows.forEach || Array.prototype.forEach; // for older browsers
+      rows.forEach(function(row){
+        var label = row.getAttribute("data-label") || "";
+        var goal = parseInt(row.getAttribute("data-goal"), 10);
+        var current = parseInt(row.getAttribute("data-current"), 10);
+        if (!goal || goal <= 0) { goal = 1; }
+        if (isNaN(current) || current < 0) { current = 0; }
+        if (current > goal) { current = goal; }
+        var pct = Math.round((current / goal) * 100);
+
+        row.innerHTML = "";
+
+        var left = document.createElement("div");
+        left.className = "progress-label";
+        left.textContent = label;
+
+        var track = document.createElement("div");
+        track.className = "progress-track";
+        var fill = document.createElement("div");
+        fill.className = "progress-fill";
+        fill.style.width = pct + "%";
+        track.appendChild(fill);
+
+        var right = document.createElement("div");
+        right.className = "progress-meta";
+        right.textContent = current + " / " + goal + " (" + pct + "%)";
+
+        row.appendChild(left);
+        row.appendChild(track);
+        row.appendChild(right);
+      });
+    }
+    buildProgress();
 
     /* -------- SAT links and scores rendering -------- */
     var DEFAULT_LINKS = {
