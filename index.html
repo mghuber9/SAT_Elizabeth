@@ -316,40 +316,54 @@
       }
     }
 
-    /* -------- Progress bars -------- */
-    function buildProgress(){
-      var rows = document.querySelectorAll(".progress-row");
-      (rows.forEach || Array.prototype.forEach).call(rows, function(row){
-        var label = row.getAttribute("data-label") || "";
-        var goal = parseInt(row.getAttribute("data-goal"), 10);
-        var current = parseInt(row.getAttribute("data-current"), 10);
-        if (!goal || goal <= 0) { goal = 1; }
-        if (isNaN(current) || current < 0) { current = 0; }
-        if (current > goal) { current = goal; }
-        var pct = Math.round((current / goal) * 100);
+    /* -------- Progress bars (baseline → goal) -------- */
+function buildProgress(){
+  var rows = document.querySelectorAll(".progress-row");
+  (rows.forEach || Array.prototype.forEach).call(rows, function(row){
+    var label    = row.getAttribute("data-label")    || "";
+    var baseline = parseInt(row.getAttribute("data-baseline"), 10);
+    var goal     = parseInt(row.getAttribute("data-goal"), 10);
+    var current  = parseInt(row.getAttribute("data-current"), 10);
 
-        row.innerHTML = "";
+    if (isNaN(baseline)) baseline = 0;
+    if (!goal || goal <= baseline) goal = baseline + 1;
+    if (isNaN(current)) current = baseline;
 
-        var left = document.createElement("div");
-        left.className = "progress-label";
-        left.textContent = label;
+    // Clamp current between baseline and goal
+    if (current < baseline) current = baseline;
+    if (current > goal)     current = goal;
 
-        var track = document.createElement("div");
-        track.className = "progress-track";
-        var fill = document.createElement("div");
-        fill.className = "progress-fill";
-        fill.style.width = pct + "%";
-        track.appendChild(fill);
+    var span = goal - baseline;                 // total range from baseline to goal
+    var gained = current - baseline;            // improvement above baseline
+    var pct = Math.round((gained / span) * 100);
 
-        var right = document.createElement("div");
-        right.className = "progress-meta";
-        right.textContent = current + " / " + goal + " (" + pct + "%)";
+    row.innerHTML = "";
 
-        row.appendChild(left);
-        row.appendChild(track);
-        row.appendChild(right);
-      });
-    }
+    // Left label (Verbal / Math / Composite)
+    var left = document.createElement("div");
+    left.className = "progress-label";
+    left.textContent = label;
+
+    // Middle track + fill
+    var track = document.createElement("div");
+    track.className = "progress-track";
+    var fill = document.createElement("div");
+    fill.className = "progress-fill";
+    fill.style.width = pct + "%";
+    track.appendChild(fill);
+
+    // Right meta text: "500 → 540 / 570 (40 pts up)"
+    var right = document.createElement("div");
+    right.className = "progress-meta";
+    right.textContent =
+      baseline + " → " + current + " / " + goal +
+      " (+" + gained + " from baseline)";
+
+    row.appendChild(left);
+    row.appendChild(track);
+    row.appendChild(right);
+  });
+}
     buildProgress();
 
     /* -------- SAT links and scores rendering -------- */
