@@ -416,9 +416,10 @@
 
     /* -------- Countdown to next SAT -------- */
     function setupCountdown(){
-      // EDIT THESE TWO DATES for the next test & registration deadline
-      var testDate = new Date("2025-12-06");  // Next SAT date
-      var regDate  = new Date("2025-11-21");  // Registration deadline
+      // Months are 0-based: 11 = December, 10 = November
+      var testDate = new Date(2025, 11, 6);  // December 6, 2025
+      var regDate  = new Date(2025, 10, 21); // November 21, 2025
+
 
       var opts = { year:"numeric", month:"long", day:"numeric" };
 
