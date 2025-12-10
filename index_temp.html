@@ -486,50 +486,59 @@
     }
 
     /* -------- Progress bars (baseline → goal) -------- */
-    function buildProgress(){
-      var rows = document.querySelectorAll(".progress-row");
-      (rows.forEach || Array.prototype.forEach).call(rows, function(row){
-        var label    = row.getAttribute("data-label")    || "";
-        var baseline = parseInt(row.getAttribute("data-baseline"), 10);
-        var goal     = parseInt(row.getAttribute("data-goal"), 10);
-        var current  = parseInt(row.getAttribute("data-current"), 10);
+    /* -------- Progress bars (baseline → goal) -------- */
+function buildProgress(currentValues){
+  var rows = document.querySelectorAll(".progress-row");
+  (rows.forEach || Array.prototype.forEach).call(rows, function(row){
+    var label    = row.getAttribute("data-label")    || "";
+    var baseline = parseInt(row.getAttribute("data-baseline"), 10);
+    var goal     = parseInt(row.getAttribute("data-goal"), 10);
 
-        if (isNaN(baseline)) baseline = 0;
-        if (!goal || goal <= baseline) goal = baseline + 1;
-        if (isNaN(current)) current = baseline;
+    // default current from data-current
+    var current  = parseInt(row.getAttribute("data-current"), 10);
 
-        // clamp between baseline and goal
-        if (current < baseline) current = baseline;
-        if (current > goal)     current = goal;
-
-        var span   = goal - baseline;       // total range
-        var gained = current - baseline;    // improvement above baseline
-        var pct    = Math.round((gained / span) * 100);
-
-        row.innerHTML = "";
-
-        var left = document.createElement("div");
-        left.className = "progress-label";
-        left.textContent = label;
-
-        var track = document.createElement("div");
-        track.className = "progress-track";
-        var fill = document.createElement("div");
-        fill.className = "progress-fill";
-        fill.style.width = pct + "%";
-        track.appendChild(fill);
-
-        var right = document.createElement("div");
-        right.className = "progress-meta";
-        right.textContent =
-          baseline + " → " + current + " / " + goal +
-          " (+" + gained + " from baseline)";
-
-        row.appendChild(left);
-        row.appendChild(track);
-        row.appendChild(right);
-      });
+    // if we were given a new value for this label, use it instead
+    if (currentValues && currentValues[label] != null){
+      current = currentValues[label];
     }
+
+    if (isNaN(baseline)) baseline = 0;
+    if (!goal || goal <= baseline) goal = baseline + 1;
+    if (isNaN(current)) current = baseline;
+
+    // clamp between baseline and goal
+    if (current < baseline) current = baseline;
+    if (current > goal)     current = goal;
+
+    var span   = goal - baseline;       // total range
+    var gained = current - baseline;    // improvement above baseline
+    var pct    = Math.round((gained / span) * 100);
+
+    row.innerHTML = "";
+
+    var left = document.createElement("div");
+    left.className = "progress-label";
+    left.textContent = label;
+
+    var track = document.createElement("div");
+    track.className = "progress-track";
+    var fill = document.createElement("div");
+    fill.className = "progress-fill";
+    fill.style.width = pct + "%";
+    track.appendChild(fill);
+
+    var right = document.createElement("div");
+    right.className = "progress-meta";
+    right.textContent =
+      baseline + " → " + current + " / " + goal +
+      " (+" + gained + " from baseline)";
+
+    row.appendChild(left);
+    row.appendChild(track);
+    row.appendChild(right);
+  });
+}
+
 
     /* -------- Countdown to next SAT -------- */
     function setupCountdown(){
@@ -747,9 +756,50 @@
         }
       });
 
-      // 3) Rebuild the SAT 1–6 cards using the updated scores
+            // 3) Rebuild the SAT 1–6 cards using the updated scores
       render();
+
+      // 4) Update the progress bars based on the best completed SAT
+      updateProgressFromSharedScores();
     };
+
+        // Use the best completed SAT (Math + Verbal) to drive the progress bars
+    function updateProgressFromSharedScores(){
+      if (!sharedScores) return;
+
+      function num(val){
+        var n = parseFloat(val);
+        return isNaN(n) ? null : n;
+      }
+
+      var best = null;
+
+      Object.keys(sharedScores || {}).forEach(function(testName){
+        var ts = sharedScores[testName] || {};
+        var cm = num(ts["Composite Math"]);
+        var cv = num(ts["Composite Verbal"]);
+        if (cm == null || cv == null) return; // need both to be "complete"
+
+        var total = cm + cv; // Overall
+        if (!best || total > best.total){
+          best = {
+            math: cm,
+            verbal: cv,
+            composite: total
+          };
+        }
+      });
+
+      if (!best) return; // no fully-complete SAT yet
+
+      // Map test scores to the labels used in the HTML rows
+      buildProgress({
+        "Verbal":    best.verbal,
+        "Math":      best.math,
+        "Composite": best.composite
+      });
+    }
+
 
 
   });
