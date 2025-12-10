@@ -1,4 +1,4 @@
-  <!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -271,10 +271,6 @@
       opacity:0.5;
     }
 
-
-
-    
-
     /* Focus tips strip */
     .focus-strip{
       background:#FFFFFF;
@@ -320,7 +316,7 @@
     <div class="progress-inner">
       <div class="progress-title">Progress Toward Goal</div>
 
-      <!-- Edit baseline/goal/current values here -->
+      <!-- Baseline/goal/current values -->
       <div class="progress-row"
            data-label="Verbal"
            data-baseline="500"
@@ -418,7 +414,7 @@
     </section>
   </main>
 
-  <!-- ===== Shared Scores Configuration (edit these placeholders) ===== -->
+  <!-- ===== Shared Scores Configuration ===== -->
   <script id="SHARED_SCORES" type="application/json">
   {
     "SAT 1": {
@@ -448,10 +444,11 @@
   }
   </script>
 
+  <!-- Main SAT / progress logic -->
   <script>
   document.addEventListener("DOMContentLoaded", function(){
 
-    /* -------- Focus tips bank -------- */
+    /* -------- Focus tips ------- */
     var FOCUS_TIPS = [
       'Review why you missed, not just what you missed.',
       'Study 20 focused minutes daily > 3 hours once a week.',
@@ -485,59 +482,57 @@
       }
     }
 
-/* -------- Progress bars (baseline → goal) -------- */
-function buildProgress(){
-  var rows = document.querySelectorAll(".progress-row");
-  (rows.forEach || Array.prototype.forEach).call(rows, function(row){
-    var label    = row.getAttribute("data-label")    || "";
-    var baseline = parseInt(row.getAttribute("data-baseline"), 10);
-    var goal     = parseInt(row.getAttribute("data-goal"), 10);
-    var current  = parseInt(row.getAttribute("data-current"), 10);
+    /* -------- Progress bars (baseline → goal) -------- */
+    function buildProgress(){
+      var rows = document.querySelectorAll(".progress-row");
+      (rows.forEach || Array.prototype.forEach).call(rows, function(row){
+        var label    = row.getAttribute("data-label")    || "";
+        var baseline = parseInt(row.getAttribute("data-baseline"), 10);
+        var goal     = parseInt(row.getAttribute("data-goal"), 10);
+        var current  = parseInt(row.getAttribute("data-current"), 10);
 
-    if (isNaN(baseline)) baseline = 0;
-    if (!goal || goal <= baseline) goal = baseline + 1;
-    if (isNaN(current)) current = baseline;
+        if (isNaN(baseline)) baseline = 0;
+        if (!goal || goal <= baseline) goal = baseline + 1;
+        if (isNaN(current)) current = baseline;
 
-    // clamp between baseline and goal
-    if (current < baseline) current = baseline;
-    if (current > goal)     current = goal;
+        // clamp between baseline and goal
+        if (current < baseline) current = baseline;
+        if (current > goal)     current = goal;
 
-    var span   = goal - baseline;       // total range
-    var gained = current - baseline;    // improvement above baseline
-    var pct    = Math.round((gained / span) * 100);
+        var span   = goal - baseline;
+        var gained = current - baseline;
+        var pct    = Math.round((gained / span) * 100);
 
-    row.innerHTML = "";
+        row.innerHTML = "";
 
-    var left = document.createElement("div");
-    left.className = "progress-label";
-    left.textContent = label;
+        var left = document.createElement("div");
+        left.className = "progress-label";
+        left.textContent = label;
 
-    var track = document.createElement("div");
-    track.className = "progress-track";
-    var fill = document.createElement("div");
-    fill.className = "progress-fill";
-    fill.style.width = pct + "%";
-    track.appendChild(fill);
+        var track = document.createElement("div");
+        track.className = "progress-track";
+        var fill = document.createElement("div");
+        fill.className = "progress-fill";
+        fill.style.width = pct + "%";
+        track.appendChild(fill);
 
-    var right = document.createElement("div");
-    right.className = "progress-meta";
-    right.textContent =
-      baseline + " → " + current + " / " + goal +
-      " (+" + gained + " from baseline)";
+        var right = document.createElement("div");
+        right.className = "progress-meta";
+        right.textContent =
+          baseline + " → " + current + " / " + goal +
+          " (+" + gained + " from baseline)";
 
-    row.appendChild(left);
-    row.appendChild(track);
-    row.appendChild(right);
-  });
-}
-
+        row.appendChild(left);
+        row.appendChild(track);
+        row.appendChild(right);
+      });
+    }
 
     /* -------- Countdown to next SAT -------- */
     function setupCountdown(){
       // Months are 0-based: 11 = December, 10 = November
-      var testDate = new Date(2025, 11, 6);  // December 6, 2025
-      var regDate  = new Date(2025, 10, 21); // November 21, 2025
-
+      var testDate = new Date(2025, 11, 6);  // Dec 6, 2025
+      var regDate  = new Date(2025, 10, 21); // Nov 21, 2025
 
       var opts = { year:"numeric", month:"long", day:"numeric" };
 
@@ -676,9 +671,7 @@ function buildProgress(){
       if (text != null) n.append(document.createTextNode(text));
       return n;
     }
-        // ===== NEW: update SAT 1–6 scores from server assignments =====
-    // This will be called later from the login/assignments script.
-    // It expects an array like: [{ assignment_id: "SAT1_M1", score: 570 }, ...]
+
     // ===== NEW: update SAT 1–6 scores from server assignments =====
     // It expects an array like: [{ assignment_id: "SAT1_M1", score: 570 }, ...]
     window.updateScoresFromServer = function(assignments){
@@ -689,10 +682,8 @@ function buildProgress(){
         var id    = (item && item.assignment_id) || "";
         var score = item && item.score;
 
-        // Ignore if there is no score
         if (!id || score === undefined || score === null || score === "") return;
 
-        // Expect IDs like SAT1_M1, SAT3_RW2, etc.
         var m = /^SAT(\d+)_(M1|M2|RW1|RW2)$/.exec(id);
         if (!m) return;
 
@@ -707,14 +698,11 @@ function buildProgress(){
         if (code === "RW2") moduleName = "R&W Module 2";
         if (!moduleName) return;
 
-        // Make sure the SAT bucket exists in sharedScores
         if (!sharedScores[testName]) sharedScores[testName] = {};
-
-        // Update the module score
         sharedScores[testName][moduleName] = String(score);
       });
 
-      // 2) Compute composite scores for each SAT where possible
+      // 2) Compute composites
       function num(val){
         var n = parseFloat(val);
         return isNaN(n) ? null : n;
@@ -728,17 +716,15 @@ function buildProgress(){
         var rw1 = num(ts["R&W Module 1"]);
         var rw2 = num(ts["R&W Module 2"]);
 
-        // Composite Math: SUM of the two math modules
+        // Composite Math: sum of math modules
         if (m1 != null && m2 != null){
           ts["Composite Math"] = String(m1 + m2);
         }
 
-
-        // Composite Verbal: SUM of the two R&W modules
+        // Composite Verbal: sum of R&W modules
         if (rw1 != null && rw2 != null){
           ts["Composite Verbal"] = String(rw1 + rw2);
         }
-
 
         // Overall: Composite Math + Composite Verbal
         var cm = num(ts["Composite Math"]);
@@ -748,70 +734,63 @@ function buildProgress(){
         }
       });
 
-            // 3) Rebuild the SAT 1–6 cards using the updated scores
+      // 3) Rebuild SAT cards
       render();
 
-      // 4) Update the progress bars based on the best completed SAT
+      // 4) Update progress bars
       updateProgressFromSharedScores();
     };
 
-    // Use the best completed SAT (Math + Verbal) to drive the progress bars
-function updateProgressFromSharedScores(){
-  if (!sharedScores) return;
+    // Use the best completed SAT to drive the progress bars
+    function updateProgressFromSharedScores(){
+      if (!sharedScores) return;
 
-  function num(val){
-    var n = parseFloat(val);
-    return isNaN(n) ? null : n;
-  }
+      function num(val){
+        var n = parseFloat(val);
+        return isNaN(n) ? null : n;
+      }
 
-  var best = null;
+      var best = null;
 
-  // Find the SAT (1–6) with both composites and the highest total
-  Object.keys(sharedScores || {}).forEach(function(testName){
-    var ts = sharedScores[testName] || {};
-    var cm = num(ts["Composite Math"]);
-    var cv = num(ts["Composite Verbal"]);
-    if (cm == null || cv == null) return; // need both to be "complete"
+      Object.keys(sharedScores || {}).forEach(function(testName){
+        var ts = sharedScores[testName] || {};
+        var cm = num(ts["Composite Math"]);
+        var cv = num(ts["Composite Verbal"]);
+        if (cm == null || cv == null) return;
 
-    var total = cm + cv; // Overall
-    if (!best || total > best.total){
-      best = {
-        math: cm,
-        verbal: cv,
-        composite: total
-      };
+        var total = cm + cv;
+        if (!best || total > best.total){
+          best = {
+            math: cm,
+            verbal: cv,
+            composite: total
+          };
+        }
+      });
+
+      if (!best) return;
+
+      var rows = document.querySelectorAll(".progress-row");
+      (rows.forEach || Array.prototype.forEach).call(rows, function(row){
+        var label = row.getAttribute("data-label") || "";
+        var val   = null;
+        if (label === "Verbal")      val = best.verbal;
+        else if (label === "Math")   val = best.math;
+        else if (label === "Composite") val = best.composite;
+
+        if (val != null){
+          row.setAttribute("data-current", String(val));
+        }
+      });
+
+      buildProgress();
     }
-  });
-
-  if (!best) return; // no fully-complete SAT yet
-
-  // Update the DOM attributes the progress bars read from
-  var rows = document.querySelectorAll(".progress-row");
-  (rows.forEach || Array.prototype.forEach).call(rows, function(row){
-    var label = row.getAttribute("data-label") || "";
-    var val   = null;
-
-    if (label === "Verbal")      val = best.verbal;
-    else if (label === "Math")   val = best.math;
-    else if (label === "Composite") val = best.composite;
-
-    if (val != null){
-      row.setAttribute("data-current", String(val));
-    }
-  });
-
-  // Re-render the bars with the updated values
-  buildProgress();
-}
-
-    }
-
-
 
   });
   </script>
-    <script>
-    // Replace this with your actual Web App URL (the one that returns JSON)
+
+  <!-- Assignments / login script -->
+  <script>
     const ASSIGNMENTS_API_URL = 'https://script.google.com/macros/s/AKfycbzQJBcPfXk2QRRVQpRjIQlcCjxDPXkDRm1wlR7AWoycj_X7eunvsN-T2RWINP8QTGDX/exec';
 
     document.addEventListener('DOMContentLoaded', function(){
@@ -854,17 +833,15 @@ function updateProgressFromSharedScores(){
           currentStudent = { studentId, pin };
           statusEl.textContent = 'Showing your next assignments.';
 
-          // Show Next 5 assignments (still only uncompleted)
+          // Next 5 list
           renderAssignments(data.assignments || []);
 
-          // NEW: use full SAT list (completed + uncompleted) if provided,
-          // otherwise fall back to assignments.
+          // Full SAT list for scorecards
           var satList = (data.satAssignments && data.satAssignments.length)
             ? data.satAssignments
             : (data.assignments || []);
 
           window.updateScoresFromServer(satList);
-
 
         }catch(err){
           console.error(err);
