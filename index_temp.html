@@ -760,6 +760,9 @@
           currentStudent = { studentId, pin };
           statusEl.textContent = 'Showing your next assignments.';
           renderAssignments(data.assignments || []);
+          // NEW: update SAT 1–6 scores
+          window.updateScoresFromServer(data.assignments || []);
+
         }catch(err){
           console.error(err);
           statusEl.textContent = 'Network error – please try again.';
