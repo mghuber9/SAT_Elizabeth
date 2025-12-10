@@ -485,22 +485,14 @@
       }
     }
 
-    /* -------- Progress bars (baseline → goal) -------- */
-    /* -------- Progress bars (baseline → goal) -------- */
-function buildProgress(currentValues){
+/* -------- Progress bars (baseline → goal) -------- */
+function buildProgress(){
   var rows = document.querySelectorAll(".progress-row");
   (rows.forEach || Array.prototype.forEach).call(rows, function(row){
     var label    = row.getAttribute("data-label")    || "";
     var baseline = parseInt(row.getAttribute("data-baseline"), 10);
     var goal     = parseInt(row.getAttribute("data-goal"), 10);
-
-    // default current from data-current
     var current  = parseInt(row.getAttribute("data-current"), 10);
-
-    // if we were given a new value for this label, use it instead
-    if (currentValues && currentValues[label] != null){
-      current = currentValues[label];
-    }
 
     if (isNaN(baseline)) baseline = 0;
     if (!goal || goal <= baseline) goal = baseline + 1;
