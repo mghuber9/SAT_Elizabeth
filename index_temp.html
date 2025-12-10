@@ -675,6 +675,45 @@
       if (text != null) n.append(document.createTextNode(text));
       return n;
     }
+        // ===== NEW: update SAT 1–6 scores from server assignments =====
+    // This will be called later from the login/assignments script.
+    // It expects an array like: [{ assignment_id: "SAT1_M1", score: 570 }, ...]
+    window.updateScoresFromServer = function(assignments){
+      if (!Array.isArray(assignments)) return;
+
+      assignments.forEach(function(item){
+        var id    = (item && item.assignment_id) || "";
+        var score = item && item.score;
+
+        // Ignore if there is no score
+        if (!id || score === undefined || score === null || score === "") return;
+
+        // Expect IDs like SAT1_M1, SAT3_RW2, etc.
+        var m = /^SAT(\d+)_(M1|M2|RW1|RW2)$/.exec(id);
+        if (!m) return;
+
+        var satNum = m[1];
+        var code   = m[2];
+
+        var testName   = "SAT " + satNum;
+        var moduleName = null;
+        if (code === "M1")  moduleName = "Math Module 1";
+        if (code === "M2")  moduleName = "Math Module 2";
+        if (code === "RW1") moduleName = "R&W Module 1";
+        if (code === "RW2") moduleName = "R&W Module 2";
+        if (!moduleName) return;
+
+        // Make sure the SAT bucket exists in sharedScores
+        if (!sharedScores[testName]) sharedScores[testName] = {};
+
+        // Update the module score
+        sharedScores[testName][moduleName] = String(score);
+      });
+
+      // Rebuild the SAT 1–6 cards using the updated scores
+      render();
+    };
+
   });
   </script>
     <script>
