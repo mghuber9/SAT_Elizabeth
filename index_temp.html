@@ -678,9 +678,12 @@
         // ===== NEW: update SAT 1–6 scores from server assignments =====
     // This will be called later from the login/assignments script.
     // It expects an array like: [{ assignment_id: "SAT1_M1", score: 570 }, ...]
+    // ===== NEW: update SAT 1–6 scores from server assignments =====
+    // It expects an array like: [{ assignment_id: "SAT1_M1", score: 570 }, ...]
     window.updateScoresFromServer = function(assignments){
       if (!Array.isArray(assignments)) return;
 
+      // 1) Update individual module scores
       assignments.forEach(function(item){
         var id    = (item && item.assignment_id) || "";
         var score = item && item.score;
@@ -710,9 +713,42 @@
         sharedScores[testName][moduleName] = String(score);
       });
 
-      // Rebuild the SAT 1–6 cards using the updated scores
+      // 2) Compute composite scores for each SAT where possible
+      function num(val){
+        var n = parseFloat(val);
+        return isNaN(n) ? null : n;
+      }
+
+      Object.keys(sharedScores || {}).forEach(function(testName){
+        var ts = sharedScores[testName] || {};
+
+        var m1  = num(ts["Math Module 1"]);
+        var m2  = num(ts["Math Module 2"]);
+        var rw1 = num(ts["R&W Module 1"]);
+        var rw2 = num(ts["R&W Module 2"]);
+
+        // Composite Math: average of two math modules
+        if (m1 != null && m2 != null){
+          ts["Composite Math"] = String(Math.round((m1 + m2) / 2));
+        }
+
+        // Composite Verbal: average of two R&W modules
+        if (rw1 != null && rw2 != null){
+          ts["Composite Verbal"] = String(Math.round((rw1 + rw2) / 2));
+        }
+
+        // Overall: Composite Math + Composite Verbal
+        var cm = num(ts["Composite Math"]);
+        var cv = num(ts["Composite Verbal"]);
+        if (cm != null && cv != null){
+          ts["Overall"] = String(cm + cv);
+        }
+      });
+
+      // 3) Rebuild the SAT 1–6 cards using the updated scores
       render();
     };
+
 
   });
   </script>
