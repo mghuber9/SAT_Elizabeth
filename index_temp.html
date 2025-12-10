@@ -755,41 +755,55 @@ function buildProgress(){
       updateProgressFromSharedScores();
     };
 
-        // Use the best completed SAT (Math + Verbal) to drive the progress bars
-    function updateProgressFromSharedScores(){
-      if (!sharedScores) return;
+    // Use the best completed SAT (Math + Verbal) to drive the progress bars
+function updateProgressFromSharedScores(){
+  if (!sharedScores) return;
 
-      function num(val){
-        var n = parseFloat(val);
-        return isNaN(n) ? null : n;
-      }
+  function num(val){
+    var n = parseFloat(val);
+    return isNaN(n) ? null : n;
+  }
 
-      var best = null;
+  var best = null;
 
-      Object.keys(sharedScores || {}).forEach(function(testName){
-        var ts = sharedScores[testName] || {};
-        var cm = num(ts["Composite Math"]);
-        var cv = num(ts["Composite Verbal"]);
-        if (cm == null || cv == null) return; // need both to be "complete"
+  // Find the SAT (1–6) with both composites and the highest total
+  Object.keys(sharedScores || {}).forEach(function(testName){
+    var ts = sharedScores[testName] || {};
+    var cm = num(ts["Composite Math"]);
+    var cv = num(ts["Composite Verbal"]);
+    if (cm == null || cv == null) return; // need both to be "complete"
 
-        var total = cm + cv; // Overall
-        if (!best || total > best.total){
-          best = {
-            math: cm,
-            verbal: cv,
-            composite: total
-          };
-        }
-      });
+    var total = cm + cv; // Overall
+    if (!best || total > best.total){
+      best = {
+        math: cm,
+        verbal: cv,
+        composite: total
+      };
+    }
+  });
 
-      if (!best) return; // no fully-complete SAT yet
+  if (!best) return; // no fully-complete SAT yet
 
-      // Map test scores to the labels used in the HTML rows
-      buildProgress({
-        "Verbal":    best.verbal,
-        "Math":      best.math,
-        "Composite": best.composite
-      });
+  // Update the DOM attributes the progress bars read from
+  var rows = document.querySelectorAll(".progress-row");
+  (rows.forEach || Array.prototype.forEach).call(rows, function(row){
+    var label = row.getAttribute("data-label") || "";
+    var val   = null;
+
+    if (label === "Verbal")      val = best.verbal;
+    else if (label === "Math")   val = best.math;
+    else if (label === "Composite") val = best.composite;
+
+    if (val != null){
+      row.setAttribute("data-current", String(val));
+    }
+  });
+
+  // Re-render the bars with the updated values
+  buildProgress();
+}
+
     }
 
 
