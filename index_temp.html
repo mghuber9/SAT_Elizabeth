@@ -180,6 +180,101 @@
       color:var(--muted);
     }
 
+    /* Assignments panel */
+    .assignments-section{
+      margin-top:18px;
+      margin-bottom:24px;
+      padding:14px 16px 16px;
+      border-radius:16px;
+      background:#FFFFFF;
+      border:1px solid var(--border);
+      box-shadow:0 6px 16px rgba(18,24,46,0.04);
+    }
+    .assignments-header h2{
+      margin:0;
+      font-size:18px;
+      font-weight:900;
+      color:#1c2140;
+    }
+    .assignments-header p{
+      margin:4px 0 0;
+      font-size:13px;
+    }
+    .assignments-login{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:flex-end;
+      margin-top:10px;
+      margin-bottom:10px;
+    }
+    .assignments-login label{
+      display:flex;
+      flex-direction:column;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .assignments-login input{
+      padding:6px 8px;
+      border-radius:8px;
+      border:1px solid var(--border);
+      font-size:14px;
+      min-width:120px;
+    }
+    .assignments-login button{
+      padding:8px 12px;
+      border-radius:10px;
+      border:2px solid var(--brand);
+      background:var(--brand);
+      color:var(--brand-ink);
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 2px 0 rgba(0,0,0,0.1);
+    }
+    .assignments-login button:hover{
+      filter:brightness(1.05);
+    }
+    .assignments-list{
+      list-style:none;
+      padding:0;
+      margin:4px 0 0;
+    }
+    .assignment-item{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:8px 0;
+      border-top:1px solid #ECEFFF;
+    }
+    .assignment-item:first-child{
+      border-top:none;
+    }
+    .assignment-checkbox{
+      margin-top:3px;
+    }
+    .assignment-title{
+      font-size:14px;
+      font-weight:600;
+      color:#1F2330;
+    }
+    .assignment-meta{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+    .assignment-saving{
+      opacity:0.6;
+    }
+    .assignment-completed{
+      text-decoration:line-through;
+      opacity:0.5;
+    }
+
+
+
+    
+
     /* Focus tips strip */
     .focus-strip{
       background:#FFFFFF;
@@ -289,6 +384,28 @@
   </section>
 
   <main class="container">
+
+    <!-- Next 5 Assignments -->
+    <section class="assignments-section">
+      <div class="assignments-header">
+        <h2>Next 5 Assignments</h2>
+        <p class="muted">Log in with your ID and PIN to see your upcoming work.</p>
+      </div>
+      <form id="login-form" class="assignments-login">
+        <label>
+          Student ID
+          <input type="text" id="student-id" autocomplete="username" required>
+        </label>
+        <label>
+          PIN
+          <input type="password" id="student-pin" inputmode="numeric" autocomplete="current-password" required>
+        </label>
+        <button type="submit">Load Assignments</button>
+        <span id="login-status" class="muted"></span>
+      </form>
+      <ul id="assignments-list" class="assignments-list"></ul>
+    </section>
+
     <div class="toolbar">
       <span class="spacer"></span>
       <button onclick="window.print()">Print</button>
@@ -559,6 +676,137 @@
       return n;
     }
   });
+  </script>
+    <script>
+    // Replace this with your actual Web App URL (the one that returns JSON)
+    const ASSIGNMENTS_API_URL = 'https://script.google.com/macros/s/AKfycbzQJBcPfXk2QRRVQpRjIQlcCjxDPXkDRm1wlR7AWoycj_X7eunvsN-T2RWINP8QTGDX/exec';
+
+    document.addEventListener('DOMContentLoaded', function(){
+      const apiUrl    = ASSIGNMENTS_API_URL;
+      const form      = document.getElementById('login-form');
+      const listEl    = document.getElementById('assignments-list');
+      const statusEl  = document.getElementById('login-status');
+      const idInput   = document.getElementById('student-id');
+      const pinInput  = document.getElementById('student-pin');
+
+      if (!form || !listEl) return;
+
+      let currentStudent = null;
+
+      form.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        const studentId = idInput.value.trim();
+        const pin       = pinInput.value.trim();
+        if (!studentId || !pin) return;
+        statusEl.textContent = 'Loading...';
+        loadAssignments(studentId, pin);
+      });
+
+      async function loadAssignments(studentId, pin){
+        try{
+          const qs = new URLSearchParams({
+            action: 'getAssignments',
+            student_id: studentId,
+            pin: pin
+          });
+          const res  = await fetch(apiUrl + '?' + qs.toString());
+          const data = await res.json();
+
+          if (!res.ok || data.error){
+            statusEl.textContent = data.error || 'Error loading assignments.';
+            listEl.innerHTML = '';
+            return;
+          }
+
+          currentStudent = { studentId, pin };
+          statusEl.textContent = 'Showing your next assignments.';
+          renderAssignments(data.assignments || []);
+        }catch(err){
+          console.error(err);
+          statusEl.textContent = 'Network error – please try again.';
+          listEl.innerHTML = '';
+        }
+      }
+
+      function renderAssignments(items){
+        listEl.innerHTML = '';
+        if (!items.length){
+          const li = document.createElement('li');
+          li.textContent = 'No upcoming assignments yet.';
+          listEl.appendChild(li);
+          return;
+        }
+
+        items.slice(0,5).forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'assignment-item';
+
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.className = 'assignment-checkbox';
+          checkbox.addEventListener('change', function(){
+            if (checkbox.checked){
+              markCompleted(item.assignment_id, li, checkbox);
+            }
+          });
+
+          const textWrap = document.createElement('div');
+          const titleEl = document.createElement('div');
+          titleEl.className = 'assignment-title';
+          titleEl.textContent = item.title || '(Untitled assignment)';
+
+          const metaEl = document.createElement('div');
+          metaEl.className = 'assignment-meta';
+          const parts = [];
+          if (item.due_date_human){
+            parts.push('Due: ' + item.due_date_human);
+          }
+          if (item.score !== undefined && item.score !== '' && item.score != null){
+            parts.push('Score: ' + item.score);
+          }
+          metaEl.textContent = parts.join(' · ');
+
+          textWrap.appendChild(titleEl);
+          textWrap.appendChild(metaEl);
+
+          li.appendChild(checkbox);
+          li.appendChild(textWrap);
+          listEl.appendChild(li);
+        });
+      }
+
+      async function markCompleted(assignmentId, li, checkbox){
+        if (!currentStudent) return;
+        li.classList.add('assignment-saving');
+
+        try{
+          const qs = new URLSearchParams({
+            action: 'completeAssignment',
+            student_id: currentStudent.studentId,
+            pin: currentStudent.pin,
+            assignment_id: assignmentId
+          });
+          const res  = await fetch(apiUrl + '?' + qs.toString());
+          const data = await res.json();
+
+          if (!res.ok || data.error){
+            statusEl.textContent = data.error || 'Could not update assignment.';
+            li.classList.remove('assignment-saving');
+            checkbox.checked = false;
+            return;
+          }
+
+          statusEl.textContent = 'Nice work – assignment marked complete.';
+          li.classList.add('assignment-completed');
+          setTimeout(() => li.remove(), 400);
+        }catch(err){
+          console.error(err);
+          statusEl.textContent = 'Network error while updating.';
+          li.classList.remove('assignment-saving');
+          checkbox.checked = false;
+        }
+      }
+    });
   </script>
 </body>
 </html>
