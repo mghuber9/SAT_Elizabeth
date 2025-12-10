@@ -759,9 +759,18 @@
 
           currentStudent = { studentId, pin };
           statusEl.textContent = 'Showing your next assignments.';
+
+          // Show Next 5 assignments (still only uncompleted)
           renderAssignments(data.assignments || []);
-          // NEW: update SAT 1–6 scores
-          window.updateScoresFromServer(data.assignments || []);
+
+          // NEW: use full SAT list (completed + uncompleted) if provided,
+          // otherwise fall back to assignments.
+          var satList = (data.satAssignments && data.satAssignments.length)
+            ? data.satAssignments
+            : (data.assignments || []);
+
+          window.updateScoresFromServer(satList);
+
 
         }catch(err){
           console.error(err);
