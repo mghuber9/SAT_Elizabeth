@@ -313,6 +313,29 @@
   </div>
 </header>
 
+<!-- Next 5 Assignments / Student Login -->
+<section class="assignments-section">
+  <div class="assignments-header">
+    <h2>Student Login</h2>
+    <p class="muted">Enter your Student ID and PIN to load your assignments, scores, and progress.</p>
+  </div>
+  <form id="login-form" class="assignments-login">
+    <label>
+      Student ID
+      <input type="text" id="student-id" autocomplete="username" required>
+    </label>
+    <label>
+      PIN
+      <input type="password" id="student-pin" inputmode="numeric" autocomplete="current-password" required>
+    </label>
+    <button type="submit">Log In</button>
+    <span id="login-status" class="muted"></span>
+  </form>
+  <ul id="assignments-list" class="assignments-list"></ul>
+</section>
+
+  
+
   <!-- Progress bars (primary goals view, baseline → goal) -->
   <section class="progress-section">
     <div class="progress-inner">
@@ -382,28 +405,6 @@
   </section>
 
   <main class="container">
-
-    <!-- Next 5 Assignments -->
-    <section class="assignments-section">
-      <div class="assignments-header">
-        <h2>Next 5 Assignments</h2>
-        <p class="muted">Log in with your ID and PIN to see your upcoming work.</p>
-      </div>
-      <form id="login-form" class="assignments-login">
-        <label>
-          Student ID
-          <input type="text" id="student-id" autocomplete="username" required>
-        </label>
-        <label>
-          PIN
-          <input type="password" id="student-pin" inputmode="numeric" autocomplete="current-password" required>
-        </label>
-        <button type="submit">Load Assignments</button>
-        <span id="login-status" class="muted"></span>
-      </form>
-      <ul id="assignments-list" class="assignments-list"></ul>
-    </section>
-
     <div class="toolbar">
       <span class="spacer"></span>
       <button onclick="window.print()">Print</button>
