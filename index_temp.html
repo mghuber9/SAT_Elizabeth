@@ -888,19 +888,33 @@ try {
     const label = row.getAttribute('data-label') || '';
 
     if (label === 'Math' && !isNaN(om)) {
-      row.setAttribute('data-baseline', String(om));
+      const baseline = om;
+      row.setAttribute('data-baseline', String(baseline));
       if (!isNaN(gm)) row.setAttribute('data-goal', String(gm));
+      // 👇 current = baseline → zero progress until real math scores arrive
+      row.setAttribute('data-current', String(baseline));
+
     } else if (label === 'Verbal' && !isNaN(ov)) {
-      row.setAttribute('data-baseline', String(ov));
+      const baseline = ov;
+      row.setAttribute('data-baseline', String(baseline));
       if (!isNaN(gv)) row.setAttribute('data-goal', String(gv));
+      // 👇 current = baseline → zero progress until real verbal scores arrive
+      row.setAttribute('data-current', String(baseline));
+
     } else if (label === 'Composite' && !isNaN(om) && !isNaN(ov)) {
-      row.setAttribute('data-baseline', String(om + ov));
+      const baseline = om + ov;
+      row.setAttribute('data-baseline', String(baseline));
       if (!isNaN(gm) && !isNaN(gv)) {
         row.setAttribute('data-goal', String(gm + gv));
       }
+      // 👇 current = baseline → zero progress until we have a full SAT
+      row.setAttribute('data-current', String(baseline));
     }
   });
-  if (window.buildProgress) window.buildProgress();  
+
+  // Re-draw bars with these fresh values
+  if (window.buildProgress) window.buildProgress();
+
 } catch(e) {
   console.error('Error updating progress baselines/goals', e);
 }
