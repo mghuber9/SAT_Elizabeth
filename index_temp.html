@@ -370,18 +370,15 @@
     </div>
   </section>
 
-  <!-- Countdown to next SAT -->
+  <!-- Upcoming SAT dates (from Google Sheet) + student's planned date -->
   <section class="countdown-section">
     <div class="countdown-inner">
-      <div class="countdown-title">Next SAT</div>
-      <div class="countdown-main">
-        <span id="sat-date-text"></span>
-        <span class="dot">•</span>
-        <span id="sat-days-remaining" class="countdown-days"></span>
-      </div>
-      <div class="countdown-sub">
-        Registration deadline:
-        <span id="sat-reg-text"></span>
+      <div class="countdown-title">Upcoming SAT Test Dates</div>
+      <div id="sat-upcoming-list"></div>
+
+      <div class="countdown-sub" id="sat-planned-line" style="margin-top:8px;">
+        Your planned test date:
+        <span id="sat-planned-date" class="countdown-days">Not set yet</span>
       </div>
     </div>
   </section>
@@ -544,34 +541,15 @@
 
 
     /* -------- Countdown to next SAT -------- */
-    function setupCountdown(){
-      // Months are 0-based: 11 = December, 10 = November
-      var testDate = new Date(2025, 11, 6);  // Dec 6, 2025
-      var regDate  = new Date(2025, 10, 21); // Nov 21, 2025
 
-      var opts = { year:"numeric", month:"long", day:"numeric" };
 
-      var dateEl = document.getElementById("sat-date-text");
-      var daysEl = document.getElementById("sat-days-remaining");
-      var regEl  = document.getElementById("sat-reg-text");
-      if (!dateEl || !daysEl || !regEl) return;
 
-      dateEl.textContent = testDate.toLocaleDateString(undefined, opts);
-      regEl.textContent  = regDate.toLocaleDateString(undefined, opts);
 
-      var today   = new Date();
-      var diffMs  = testDate - today;
-      var diffDay = Math.ceil(diffMs / (1000*60*60*24));
 
-      if (diffDay >= 0){
-        daysEl.textContent = diffDay + " day" + (diffDay === 1 ? "" : "s") + " to go";
-      } else {
-        daysEl.textContent = "test date has passed";
-      }
-    }
-
+    
     buildProgress();
-    setupCountdown();
+    // setupCountdown();  // no longer needed; dates come from the server now
+
 
     /* -------- SAT links and scores rendering -------- */
     var DEFAULT_LINKS = {
@@ -918,6 +896,10 @@ try {
 } catch(e) {
   console.error('Error updating progress baselines/goals', e);
 }
+          
+  // NEW: upcoming SAT dates from the server
+  renderUpcomingSatDates(data.sat_dates || []);
+          
 
 // Next 5 list
 renderAssignments(data.assignments || []);
@@ -982,6 +964,67 @@ window.updateScoresFromServer(satList);
           listEl.appendChild(li);
         });
       }
+
+            // NEW: Render upcoming SAT test dates from data.sat_dates
+      function renderUpcomingSatDates(dates) {
+        const listEl = document.getElementById('sat-upcoming-list');
+        if (!listEl) return;
+
+        listEl.innerHTML = '';
+
+        if (!Array.isArray(dates) || !dates.length) {
+          const msg = document.createElement('div');
+          msg.className = 'countdown-sub';
+          msg.textContent = 'No upcoming SAT dates available.';
+          listEl.appendChild(msg);
+          return;
+        }
+
+        const today = new Date();
+
+        dates.forEach(item => {
+          const line = document.createElement('div');
+          line.className = 'countdown-main';
+
+          const dateText = item.date_human || item.date_iso || '';
+          const dateSpan = document.createElement('span');
+          dateSpan.textContent = dateText;
+
+          const dot = document.createElement('span');
+          dot.className = 'dot';
+          dot.textContent = '•';
+
+          const daysSpan = document.createElement('span');
+          daysSpan.className = 'countdown-days';
+
+          if (item.date_iso) {
+            const testDate = new Date(item.date_iso);
+            const diffMs = testDate - today;
+            const diffDay = Math.ceil(diffMs / (1000*60*60*24));
+            if (diffDay >= 0) {
+              daysSpan.textContent = diffDay + ' day' + (diffDay === 1 ? '' : 's') + ' away';
+            } else {
+              daysSpan.textContent = 'date has passed';
+            }
+          } else {
+            daysSpan.textContent = '';
+          }
+
+          line.appendChild(dateSpan);
+          line.appendChild(dot);
+          line.appendChild(daysSpan);
+          listEl.appendChild(line);
+
+          // Optional: show registration deadline as a smaller line
+          if (item.reg_human) {
+            const regLine = document.createElement('div');
+            regLine.className = 'countdown-sub';
+            regLine.textContent = 'Registration deadline: ' + item.reg_human;
+            listEl.appendChild(regLine);
+          }
+        });
+      }
+
 
       async function markCompleted(assignmentId, li, checkbox){
         if (!currentStudent) return;
