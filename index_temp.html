@@ -336,8 +336,12 @@
 
   
 
+    <!-- Everything below is hidden until login -->
+  <div id="dashboard-content" style="display:none;">
+
   <!-- Progress bars (primary goals view, baseline → goal) -->
   <section class="progress-section">
+
     <div class="progress-inner">
       <div class="progress-title">Progress Toward Goal</div>
 
@@ -416,6 +420,7 @@
       <p><span class="badge">Tip</span> Host on GitHub Pages and embed in Google Sites (iframe). Edit the URLs in <strong>DEFAULT_LINKS</strong> and the scores in the <strong>SCORES</strong> JSON below.</p>
     </section>
   </main>
+  </div> <!-- end #dashboard-content -->
 
   <!-- ===== Shared Scores Configuration ===== -->
   <script id="SHARED_SCORES" type="application/json">
@@ -840,6 +845,11 @@
 
 currentStudent = { studentId, pin };
 statusEl.textContent = 'Showing your next assignments.';
+
+// 👇 NEW: reveal the main dashboard content
+const dash = document.getElementById('dashboard-content');
+if (dash) dash.style.display = '';
+
 
 // ▼ NEW: personalize header + page title
 if (data.display_name) {
