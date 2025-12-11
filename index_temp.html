@@ -331,6 +331,10 @@
     <button type="submit">Log In</button>
     <span id="login-status" class="muted"></span>
   </form>
+
+  <h2 id="assignments-title" style="display:none; margin-top:10px;">Next 5 Assignments</h2>
+
+  
   <ul id="assignments-list" class="assignments-list"></ul>
 </section>
 
@@ -849,6 +853,17 @@ statusEl.textContent = 'Showing your next assignments.';
 // 👇 NEW: reveal the main dashboard content
 const dash = document.getElementById('dashboard-content');
 if (dash) dash.style.display = '';
+
+// 👇 NEW: hide the login form + login header
+const loginForm = document.getElementById('login-form');
+const loginHeader = document.querySelector('.assignments-header');
+if (loginForm) loginForm.style.display = 'none';
+if (loginHeader) loginHeader.style.display = 'none';
+
+// 👇 NEW: show the "Next 5 Assignments" title
+const assignTitle = document.getElementById('assignments-title');
+if (assignTitle) assignTitle.style.display = '';
+
 
 
 // ▼ NEW: personalize header + page title
