@@ -823,6 +823,8 @@
           });
           const res  = await fetch(apiUrl + '?' + qs.toString());
           const data = await res.json();
+          console.log('API data:', data);
+
 
           if (!res.ok || data.error){
             statusEl.textContent = data.error || 'Error loading assignments.';
