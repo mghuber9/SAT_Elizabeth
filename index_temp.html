@@ -890,26 +890,36 @@ try {
     }
   });
 
-  // Re-draw bars with these fresh values
-  if (window.buildProgress) window.buildProgress();
+      // Re-draw bars with these fresh values
+      if (window.buildProgress) window.buildProgress();
 
-} catch(e) {
-  console.error('Error updating progress baselines/goals', e);
-}
-          
-  // NEW: upcoming SAT dates from the server
-  renderUpcomingSatDates(data.sat_dates || []);
-          
+    } catch(e) {
+      console.error('Error updating progress baselines/goals', e);
+    }
 
-// Next 5 list
-renderAssignments(data.assignments || []);
+    // NEW: upcoming SAT dates from the server
+    renderUpcomingSatDates(data.sat_dates || []);
 
-// Full SAT list for scorecards
-var satList = (data.satAssignments && data.satAssignments.length)
-  ? data.satAssignments
-  : (data.assignments || []);
+    // NEW: student's planned test date display
+    const plannedSpan = document.getElementById('sat-planned-date');
+    if (plannedSpan) {
+      if (data.planned_test_date_human || data.planned_test_date_iso) {
+        plannedSpan.textContent = data.planned_test_date_human || data.planned_test_date_iso;
+      } else {
+        plannedSpan.textContent = 'Not set yet';
+      }
+    }
 
-window.updateScoresFromServer(satList);
+    // Next 5 list
+    renderAssignments(data.assignments || []);
+
+    // Full SAT list for scorecards
+    var satList = (data.satAssignments && data.satAssignments.length)
+      ? data.satAssignments
+      : (data.assignments || []);
+
+    window.updateScoresFromServer(satList);
+
 
         }catch(err){
           console.error(err);
