@@ -907,6 +907,31 @@ try {
     // NEW: upcoming SAT dates from the server
     renderUpcomingSatDates(data.sat_dates || []);
 
+// NEW: populate the planned-date dropdown from SAT_Dates
+const plannedSelect = document.getElementById('planned-date-input');
+if (plannedSelect) {
+  // Keep the first option ("Select a test date…"), clear everything else
+  plannedSelect.innerHTML = '<option value="">Select a test date…</option>';
+
+  (data.sat_dates || []).forEach(item => {
+    if (!item || !item.date_iso) return;
+    const opt = document.createElement('option');
+    opt.value = item.date_iso;
+    opt.textContent = item.label
+      ? (item.label + ' — ' + (item.date_human || item.date_iso))
+      : (item.date_human || item.date_iso);
+    plannedSelect.appendChild(opt);
+  });
+
+  // If student already has a planned date saved, select it
+  if (data.planned_test_date_iso) {
+    plannedSelect.value = data.planned_test_date_iso;
+  }
+}
+
+
+          
+
     // NEW: student's planned test date display
     const plannedSpan = document.getElementById('sat-planned-date');
     if (plannedSpan) {
