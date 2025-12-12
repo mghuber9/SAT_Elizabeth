@@ -1088,6 +1088,13 @@ try {
         }
       }
 
+      // NEW: Hook up the Save button click
+      const plannedSaveBtn = document.getElementById('planned-date-save');
+      if (plannedSaveBtn) {
+        plannedSaveBtn.addEventListener('click', function () {
+          savePlannedDate();
+        });
+      }
 
 
       
