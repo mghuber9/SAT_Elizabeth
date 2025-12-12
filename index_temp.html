@@ -1088,6 +1088,75 @@ try {
         }
       }
 
+      // NEW: Save student's self-chosen planned test date
+      async function savePlannedDate(){
+        if (!currentStudent) {
+          alert('Please log in first.');
+          return;
+        }
+
+        const input = document.getElementById('planned-date-input');
+        const span  = document.getElementById('sat-planned-date');
+        const btn   = document.getElementById('planned-date-save');
+
+        if (!input || !input.value) {
+          alert('Please pick a date first.');
+          return;
+        }
+
+        const plannedValue = input.value;  // format: YYYY-MM-DD from <input type="date">
+
+        try {
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+          }
+
+          const qs = new URLSearchParams({
+            action: 'setPlannedTestDate',
+            student_id: currentStudent.studentId,
+            pin: currentStudent.pin,
+            planned_date: plannedValue
+          });
+
+          const res  = await fetch(apiUrl + '?' + qs.toString());
+          const data = await res.json();
+
+          if (!res.ok || data.error) {
+            console.error('Error saving planned date:', data.error || res.statusText);
+            alert(data.error || 'Could not save planned date.');
+            return;
+          }
+
+          // Update the display text using the formatted date from the server if available
+          if (span) {
+            span.textContent =
+              data.planned_test_date_human ||
+              data.planned_test_date_iso ||
+              plannedValue;
+          }
+
+        } catch (err) {
+          console.error('Network error while saving planned date:', err);
+          alert('Network error while saving planned date.');
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Save';
+          }
+        }
+      }
+
+      // Wire up the Save button once, after DOM is ready
+      const plannedSaveBtn = document.getElementById('planned-date-save');
+      if (plannedSaveBtn) {
+        plannedSaveBtn.addEventListener('click', function () {
+          savePlannedDate();
+        });
+      }
+
+
+      
       async function markCompleted(assignmentId, li, checkbox){
 
         if (!currentStudent) return;
