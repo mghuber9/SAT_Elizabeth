@@ -1089,57 +1089,6 @@ try {
       }
 
 
-      // ===== Planned test date: Save button =====
-      const plannedInput = document.getElementById('planned-date-input');
-      const plannedBtn   = document.getElementById('planned-date-save');
-
-      if (plannedBtn && plannedInput) {
-        plannedBtn.addEventListener('click', savePlannedDate);
-      }
-
-      async function savePlannedDate() {
-        if (!currentStudent) {
-          statusEl.textContent = 'Please log in first.';
-          return;
-        }
-
-        const dateStr = (plannedInput.value || '').trim(); // YYYY-MM-DD
-        if (!dateStr) {
-          statusEl.textContent = 'Pick a date first, then click Save.';
-          return;
-        }
-
-        try {
-          statusEl.textContent = 'Saving planned test date...';
-
-          const qs = new URLSearchParams({
-            action: 'setPlannedTestDate',
-            student_id: currentStudent.studentId,
-            pin: currentStudent.pin,
-            planned_test_date: dateStr
-          });
-
-          const res  = await fetch(apiUrl + '?' + qs.toString());
-          const data = await res.json();
-
-          if (!res.ok || data.error) {
-            statusEl.textContent = data.error || 'Could not save planned date.';
-            return;
-          }
-
-          // Update the text immediately (use noon to avoid timezone "day before" issues)
-          const plannedSpan = document.getElementById('sat-planned-date');
-          if (plannedSpan) {
-            const d = new Date(dateStr + 'T12:00:00');
-            plannedSpan.textContent = d.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
-          }
-
-          statusEl.textContent = 'Planned test date saved.';
-        } catch (err) {
-          console.error(err);
-          statusEl.textContent = 'Network error while saving planned date.';
-        }
-      }
 
       
       async function markCompleted(assignmentId, li, checkbox){
