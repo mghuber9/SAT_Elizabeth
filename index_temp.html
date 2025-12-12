@@ -1090,11 +1090,15 @@ if (plannedSelect) {
           if (status) status.textContent = 'Saving planned date...';
 
           const qs = new URLSearchParams({
-            action: 'setPlannedTestDate',
-            student_id: currentStudent.studentId,
-            pin: currentStudent.pin,
-            planned_date: val
-          });
+          action: 'setPlannedTestDate',
+          student_id: currentStudent.studentId,
+          pin: currentStudent.pin,
+
+          // send BOTH names to match whichever the backend expects
+          planned_date: val,
+          planned_test_date: val
+        });
+
 
           const res  = await fetch(apiUrl + '?' + qs.toString());
           const data = await res.json();
