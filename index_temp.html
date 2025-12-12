@@ -996,51 +996,100 @@ try {
 
         const today = new Date();
 
-        dates.forEach(item => {
-          const line = document.createElement('div');
-          line.className = 'countdown-main';
+      dates.forEach(item => {
+        const line = document.createElement('div');
+        line.className = 'countdown-main';
 
-          const dateText = item.date_human || item.date_iso || '';
-          const dateSpan = document.createElement('span');
-          dateSpan.textContent = dateText;
+        const dateText = item.date_human || item.date_iso || '';
+        const dateSpan = document.createElement('span');
+        dateSpan.textContent = dateText;
 
-          const dot = document.createElement('span');
-          dot.className = 'dot';
-          dot.textContent = '•';
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        dot.textContent = '•';
 
-          const daysSpan = document.createElement('span');
-          daysSpan.className = 'countdown-days';
+        const daysSpan = document.createElement('span');
+        daysSpan.className = 'countdown-days';
 
-          if (item.date_iso) {
-            const testDate = new Date(item.date_iso);
-            const diffMs = testDate - today;
-            const diffDay = Math.ceil(diffMs / (1000*60*60*24));
-            if (diffDay >= 0) {
-              daysSpan.textContent = diffDay + ' day' + (diffDay === 1 ? '' : 's') + ' away';
-            } else {
-              daysSpan.textContent = 'date has passed';
-            }
+        if (item.date_iso) {
+          const testDate = new Date(item.date_iso);
+          const diffMs = testDate - today;
+          const diffDay = Math.ceil(diffMs / (1000*60*60*24));
+          if (diffDay >= 0) {
+            daysSpan.textContent = diffDay + ' day' + (diffDay === 1 ? '' : 's') + ' away';
           } else {
-            daysSpan.textContent = '';
+            daysSpan.textContent = 'date has passed';
           }
+        } else {
+          daysSpan.textContent = '';
+        }
 
-          line.appendChild(dateSpan);
-          line.appendChild(dot);
-          line.appendChild(daysSpan);
-          listEl.appendChild(line);
+        line.appendChild(dateSpan);
+        line.appendChild(dot);
+        line.appendChild(daysSpan);
+        listEl.appendChild(line);
 
-          // Optional: show registration deadline as a smaller line
-          if (item.reg_human) {
-            const regLine = document.createElement('div');
-            regLine.className = 'countdown-sub';
-            regLine.textContent = 'Registration deadline: ' + item.reg_human;
-            listEl.appendChild(regLine);
-          }
-        });
+        // Optional: show registration deadline as a smaller line
+        if (item.reg_human) {
+          const regLine = document.createElement('div');
+          regLine.className = 'countdown-sub';
+          regLine.textContent = 'Registration deadline: ' + item.reg_human;
+          listEl.appendChild(regLine);
+        }
+      });
       }
 
+      // NEW: Save planned test date to the server
+      async function savePlannedDate() {
+        const input  = document.getElementById('planned-date-input');
+        const span   = document.getElementById('sat-planned-date');
+        const status = document.getElementById('login-status');
+
+        if (!input) return;
+        const val = (input.value || '').trim();
+        if (!val) {
+          if (status) status.textContent = 'Please choose a date before saving.';
+          return;
+        }
+
+        // We stored currentStudent after login
+        if (!currentStudent || !currentStudent.studentId || !currentStudent.pin) {
+          if (status) status.textContent = 'Please log in before setting a date.';
+          return;
+        }
+
+        try {
+          if (status) status.textContent = 'Saving planned date...';
+
+          const qs = new URLSearchParams({
+            action: 'setPlannedTestDate',
+            student_id: currentStudent.studentId,
+            pin: currentStudent.pin,
+            planned_date: val
+          });
+
+          const res  = await fetch(apiUrl + '?' + qs.toString());
+          const data = await res.json();
+
+          if (!res.ok || data.error) {
+            if (status) status.textContent = data.error || 'Error saving planned date.';
+            return;
+          }
+
+          if (span) {
+            span.textContent = data.planned_test_date_human || data.planned_test_date_iso || val;
+          }
+
+          if (status) status.textContent = 'Planned test date saved.';
+
+        } catch (err) {
+          console.error(err);
+          if (status) status.textContent = 'Network error while saving planned date.';
+        }
+      }
 
       async function markCompleted(assignmentId, li, checkbox){
+
         if (!currentStudent) return;
         li.classList.add('assignment-saving');
 
