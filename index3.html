@@ -1070,11 +1070,23 @@ visible.slice(0,5).forEach(item => {
 
 
   
-          checkbox.addEventListener('change', function(){
-            if (checkbox.checked){
-              markCompleted(item.assignment_id, li, checkbox);
-            }
-          });
+          checkbox.addEventListener('change', async function(){
+  try{
+    if (checkbox.checked){
+      // ✅ mark completed
+      await markCompleted(item.assignment_id, li, checkbox);
+    } else {
+      // ✅ undo completion
+      await undoCompleted(item.assignment_id, li, checkbox);
+    }
+  } catch(err){
+    // Revert checkbox if something fails
+    checkbox.checked = !checkbox.checked;
+    console.error(err);
+    alert((err && err.message) ? err.message : String(err));
+  }
+});
+
 
           const textWrap = document.createElement('div');
           const titleEl = document.createElement('div');
@@ -1262,6 +1274,43 @@ li.classList.add('assignment-completed');
           checkbox.checked = false;
         }
       }
+
+async function undoCompleted(assignmentId, li, checkbox){
+  if (!currentStudent) return;
+
+  li.classList.add('assignment-saving');
+
+  try{
+    const qs = new URLSearchParams({
+      action: 'uncompleteAssignment',
+      student_id: currentStudent.studentId,
+      pin: currentStudent.pin,
+      assignment_id: assignmentId
+    });
+
+    const res  = await fetch(apiUrl + '?' + qs.toString());
+    const data = await res.json();
+
+    if (!res.ok || data.error){
+      statusEl.textContent = data.error || 'Could not undo completion.';
+      li.classList.remove('assignment-saving');
+      checkbox.checked = true; // revert UI
+      return;
+    }
+
+    statusEl.textContent = 'Marked as not completed.';
+    li.classList.remove('assignment-completed');
+    li.classList.remove('assignment-saving');
+  }catch(err){
+    console.error(err);
+    statusEl.textContent = 'Network error while undoing.';
+    li.classList.remove('assignment-saving');
+    checkbox.checked = true; // revert UI
+  }
+}
+
+
+      
     });
   </script>
 </body>
