@@ -1049,13 +1049,27 @@ if (plannedSelect) {
           return;
         }
 
-        items.slice(0,5).forEach(item => {
+        const visible = (items || []).filter(item => {
+  const hasScore = (item.score !== undefined && item.score !== '' && item.score != null);
+  // show if not completed OR completed but ungraded
+  return !item.completed || !hasScore;
+});
+
+visible.slice(0,5).forEach(item => {
+
           const li = document.createElement('li');
           li.className = 'assignment-item';
 
           const checkbox = document.createElement('input');
           checkbox.type = 'checkbox';
           checkbox.className = 'assignment-checkbox';
+  if (item.completed){
+  checkbox.checked = true;
+  li.classList.add('assignment-completed');
+}
+
+
+  
           checkbox.addEventListener('change', function(){
             if (checkbox.checked){
               markCompleted(item.assignment_id, li, checkbox);
@@ -1070,13 +1084,20 @@ if (plannedSelect) {
           const metaEl = document.createElement('div');
           metaEl.className = 'assignment-meta';
           const parts = [];
-          if (item.due_date_human){
-            parts.push('Due: ' + item.due_date_human);
-          }
-          if (item.score !== undefined && item.score !== '' && item.score != null){
-            parts.push('Score: ' + item.score);
-          }
-          metaEl.textContent = parts.join(' · ');
+if (item.due_date_human){
+  parts.push('Due: ' + item.due_date_human);
+}
+
+const hasScore = (item.score !== undefined && item.score !== '' && item.score != null);
+
+if (hasScore){
+  parts.push('Score: ' + item.score);
+} else if (item.completed){
+  parts.push('Submitted — awaiting grade');
+}
+
+metaEl.textContent = parts.join(' · ');
+
 
           textWrap.appendChild(titleEl);
           textWrap.appendChild(metaEl);
@@ -1232,9 +1253,8 @@ if (plannedSelect) {
             return;
           }
 
-          statusEl.textContent = 'Nice work – assignment marked complete.';
-          li.classList.add('assignment-completed');
-          setTimeout(() => li.remove(), 400);
+          statusEl.textContent = 'Nice work — marked complete. Waiting for grade.';
+li.classList.add('assignment-completed');
         }catch(err){
           console.error(err);
           statusEl.textContent = 'Network error while updating.';
