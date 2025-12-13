@@ -44,17 +44,22 @@
     .spacer{flex:1}
     button,.linklike{
       appearance:none;
-      border:2px solid var(--brand);
+      border:none;
       background:var(--brand);
       color:var(--brand-ink);
-      padding:10px 14px;
-      border-radius:12px;
+      padding:10px 16px;
+      border-radius:999px;
       cursor:pointer;
-      font-weight:800;
+      font-weight:700;
       text-decoration:none;
-      box-shadow:0 2px 0 rgba(0,0,0,0.12);
+      box-shadow:0 6px 14px rgba(38,78,54,0.25);
     }
-    button:hover,.linklike:hover{filter:brightness(1.05)}
+
+    button:hover,.linklike:hover{
+      filter:brightness(1.08);
+      transform:translateY(-1px);
+    }
+
     .sat-section{padding:22px 0 26px;border-top:2px solid var(--border)}
     .sat-header{display:flex;align-items:baseline;gap:10px;margin:6px 0 14px}
     .sat-title{font-size:18px;font-weight:900;color:#131729}
