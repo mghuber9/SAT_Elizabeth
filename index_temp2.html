@@ -275,12 +275,19 @@
       color:var(--muted);
     }
     .assignments-login input{
-      padding:6px 8px;
-      border-radius:8px;
-      border:1px solid var(--border);
-      font-size:14px;
-      min-width:120px;
-    }
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  font-size:14px;
+  min-width:140px;
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+    .assignments-login input:focus{
+  outline:none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(38,78,54,0.18);
+}
+
     .assignments-login button{
       padding:8px 12px;
       border-radius:10px;
